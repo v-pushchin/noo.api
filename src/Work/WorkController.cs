@@ -28,12 +28,15 @@ public class WorkController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    
     public async Task<IActionResult> CreateWork(WorkModel work)
     {
+        var validated = this.validator.Validate(work);
         this.requestContext.PermissionResolver.HasPermission(Permissions.CreateWorks);
+
         try
         {
+            if (!validated.IsValid)
+                return BadRequest(validated.Errors);
             await this.workService.CreateAsync(work);
             return Ok();
         }
@@ -44,11 +47,18 @@ public class WorkController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpPut]
     public async Task<IActionResult> UpdateWork(WorkModel work)
     {
+        var validated = this.validator.Validate(work);
         this.requestContext.PermissionResolver.HasPermission(Permissions.CreateWorks);
+
         try
         {
+            if (!validated.IsValid)
+                return BadRequest(validated.Errors);
+            
             await this.workService.UpdateAsync(work);
             return Ok();
         }
@@ -59,6 +69,8 @@ public class WorkController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteWork(Ulid id)
     {
         this.requestContext.PermissionResolver.HasPermission(Permissions.CreateWorks);
@@ -73,13 +85,16 @@ public class WorkController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    public async Task<IActionResult> CheckWork(WorkModel work)
+
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetWork(Ulid id)
     {
-        this.requestContext.PermissionResolver.HasPermission(Permissions.CheckWorks);
+        this.requestContext.PermissionResolver.HasPermission(Permissions.SolveWorks); // ? Get work for teacher??
         try
         {
-            await this.workService.UpdateAsync(work);
-            return Ok();
+            var work = await this.workService.GetAsync(id);
+            return Ok(work);
         }
         catch (Exception e)
         {
@@ -87,13 +102,16 @@ public class WorkController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    public async Task<IActionResult> SolveWork(WorkModel work)
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetWorks()
     {
-        this.requestContext.PermissionResolver.HasPermission(Permissions.SolveWorks);
+        this.requestContext.PermissionResolver.HasPermission(Permissions.SolveWorks); // ? Get work for teacher??
         try
         {
-            await this.workService.UpdateAsync(work);
-            return Ok();
+            var works = await this.workService.GetAsync();
+            return Ok(works);
         }
         catch (Exception e)
         {

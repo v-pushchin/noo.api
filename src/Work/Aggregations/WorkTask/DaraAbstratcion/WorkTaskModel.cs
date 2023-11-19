@@ -15,6 +15,11 @@ namespace noo.api.Work.Aggregations.WorkTask.DataAbstraction;
         // [JsonPropertyName("name")]
         // public string? Name { get; set; } = null!;
 
+        [Column("type")]
+        [Required]
+        [JsonPropertyName("type")]
+        public WorkTaskType Type { get; set; }
+
         [Column("max_points")]
         // ? MaxLength
         [Required]
@@ -33,5 +38,5 @@ namespace noo.api.Work.Aggregations.WorkTask.DataAbstraction;
         [Column("work_id")]
         [JsonPropertyName("work_id")]
         [Required]
-        public WorkModel WorkId { get; set; } = null!;
+        public Ulid WorkId { get; set; }
     }
